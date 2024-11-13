@@ -4,6 +4,7 @@ import re
 from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 
+
 def validate_phone(value):
     phone_regex = re.compile(r'^\+998\d{9}$')
     if not phone_regex.match(value):
