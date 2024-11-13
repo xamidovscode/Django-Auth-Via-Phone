@@ -29,7 +29,19 @@ class RegisterSerializer(serializers.Serializer):
         else:
             instance = models.CustomUser.objects.create_user(phone=validated_data['phone'], password=validated_data['password1'])
         code = generate_random_number()
-        cache.set(f"phone_verification_{instance.phone}", code, timeout=120)
+        cache.set(instance.phone, code, timeout=120)
         return instance
 
+
+class CodeVerificationSerializer(serializers.Serializer):
+    code = serializers.CharField(max_length=255, required=True)
+
+    def validate(self, attrs):
+        request = self.context['request']
+        cache_code = cache.get(request.user.phone)
+        if not cache_code:
+            raise serializers.ValidationError({"code": "Code expired"})
+        elif cache_code != attrs['code']:
+            raise serializers.ValidationError({"code": "Code is not correct"})
+        return attrs
 
