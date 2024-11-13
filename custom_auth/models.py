@@ -20,14 +20,15 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractUser):
+    username = None
+    last_name = None
+    email = None
     phone = models.CharField(max_length=15, unique=True)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'phone'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ["first_name"]
 
     def __str__(self):
         return self.phone
