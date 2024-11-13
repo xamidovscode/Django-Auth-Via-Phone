@@ -43,6 +43,3 @@ class CodeVerificationSerializer(serializers.Serializer):
         elif cache_code != attrs['code']:
             raise serializers.ValidationError({"code": "Code is not correct"})
         return attrs
-
-
-
