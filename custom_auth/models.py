@@ -16,6 +16,7 @@ class CustomUserManager(BaseUserManager):
     def create_superuser(self, phone, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('status', 'code_verified')
 
         return self.create_user(phone, password, **extra_fields)
 
@@ -49,7 +50,7 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.phone
 
-    def save(self, *args, **kwargs):
-        if self.password:
-            self.set_password(self.password)
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if self.password:
+    #         self.set_password(self.password)
+    #     super().save(*args, **kwargs)

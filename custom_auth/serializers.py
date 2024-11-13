@@ -17,7 +17,7 @@ class RegisterSerializer(serializers.Serializer):
     def create(self, validated_data):
         user = models.CustomUser.objects.filter(phone=validated_data['phone']).first()
         if user:
-            user.password = validated_data['password']
+            user.password = validated_data['password1']
             user.save()
             instance = user
         else:
