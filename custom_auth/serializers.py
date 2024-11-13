@@ -1,5 +1,11 @@
 from rest_framework import serializers
 from . import models
+import random
+from django.core.cache import cache
+
+
+def generate_random_number():
+    return ''.join([str(random.randint(0, 9)) for _ in range(5)])
 
 
 class RegisterSerializer(serializers.Serializer):
@@ -22,6 +28,8 @@ class RegisterSerializer(serializers.Serializer):
             instance = user
         else:
             instance = models.CustomUser.objects.create_user(phone=validated_data['phone'], password=validated_data['password1'])
+        code = generate_random_number()
+        cache.set(f"phone_verification_{instance.phone}", code, timeout=120)
         return instance
 
 
