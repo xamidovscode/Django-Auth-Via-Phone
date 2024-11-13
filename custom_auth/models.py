@@ -2,6 +2,13 @@ from django.db import models
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractUser
 from django.core.validators import RegexValidator
+import re
+from rest_framework.exceptions import ValidationError
+
+def validate_phone(value):
+    phone_regex = re.compile(r'^\+998\d{9}$')
+    if not phone_regex.match(value):
+        raise ValidationError({"phone": "Phone is not valid"})
 
 
 class CustomUserManager(BaseUserManager):
@@ -30,15 +37,10 @@ class CustomUser(AbstractUser):
         NEW = "new", "New"
         CODE_VERIFIED = "code_verified", "Code Verified"
 
-    phone_validator = RegexValidator(
-        regex=r'^\+998[0-9]{9}$',
-        message="Telefon raqami noto‘g‘ri formatda. Telefon raqami +998 bilan boshlanishi va 9 ta raqamdan iborat bo‘lishi kerak."
-    )
-
     phone = models.CharField(
         max_length=15,
         unique=True,
-        validators=[phone_validator]
+        validators=[validate_phone]
     )
     status = models.CharField(max_length=255, choices=StatusChoices.choices, default=StatusChoices.NEW)
 
@@ -50,7 +52,8 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.phone
 
-    # def save(self, *args, **kwargs):
-    #     if self.password:
-    #         self.set_password(self.password)
-    #     super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        if not self.password:
+            self.set_password(self.password)
+        super().save(*args, **kwargs)
