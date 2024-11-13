@@ -3,7 +3,6 @@ from . import models
 import random
 from django.core.cache import cache
 
-
 def generate_random_number():
     return ''.join([str(random.randint(0, 9)) for _ in range(5)])
 
