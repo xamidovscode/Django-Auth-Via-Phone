@@ -1,9 +1,8 @@
 from django.db import models
-from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractUser
-from django.core.validators import RegexValidator
 import re
 from rest_framework.exceptions import ValidationError
+from rest_framework_simplejwt.tokens import RefreshToken
 
 def validate_phone(value):
     phone_regex = re.compile(r'^\+998\d{9}$')
@@ -51,6 +50,13 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.phone
+
+    def tokens(self):
+        refresh = RefreshToken.for_user(self)
+        return {
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+        }
 
     def save(self, *args, **kwargs):
         if not self.password:
