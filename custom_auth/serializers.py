@@ -44,3 +44,5 @@ class CodeVerificationSerializer(serializers.Serializer):
             raise serializers.ValidationError({"code": "Code is not correct"})
         return attrs
 
+
+
