@@ -53,7 +53,6 @@ class CustomUser(AbstractUser):
         return self.phone
 
     def save(self, *args, **kwargs):
-        self.full_clean()
         if not self.password:
             self.set_password(self.password)
         super().save(*args, **kwargs)
