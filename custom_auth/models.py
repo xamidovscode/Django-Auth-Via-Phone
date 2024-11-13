@@ -1,6 +1,7 @@
 from django.db import models
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractUser
+from django.core.validators import RegexValidator
 
 
 class CustomUserManager(BaseUserManager):
@@ -23,7 +24,17 @@ class CustomUser(AbstractUser):
     username = None
     last_name = None
     email = None
-    phone = models.CharField(max_length=15, unique=True)
+
+    phone_validator = RegexValidator(
+        regex=r'^\+998[0-9]{9}$',
+        message="Telefon raqami noto‘g‘ri formatda. Telefon raqami +998 bilan boshlanishi va 9 ta raqamdan iborat bo‘lishi kerak."
+    )
+
+    phone = models.CharField(
+        max_length=15,
+        unique=True,
+        validators=[phone_validator]
+    )
 
     objects = CustomUserManager()
 
