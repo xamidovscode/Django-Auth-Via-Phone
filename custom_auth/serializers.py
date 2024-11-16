@@ -28,8 +28,11 @@ class RegisterSerializer(serializers.Serializer):
         else:
             instance = models.CustomUser.objects.create_user(phone=validated_data['phone'], password=validated_data['password1'])
         code = generate_random_number()
-        print(code)
+        """
+        just send code to the phone number
+        """
         cache.set(instance.phone, code, timeout=120)
+        print(code)
         return instance
 
 
@@ -37,10 +40,24 @@ class CodeVerificationSerializer(serializers.Serializer):
     code = serializers.CharField(max_length=255, required=True)
 
     def validate(self, attrs):
-        request = self.context.get('request')
-        cache_code = cache.get(request.user.phone)
+        user = self.context.get('user')
+        cache_code = cache.get(user.phone)
         if not cache_code:
             raise serializers.ValidationError({"code": "Code expired"})
         elif cache_code != attrs['code']:
             raise serializers.ValidationError({"code": "Code is not correct"})
         return attrs
+
+
+class LoginSerializer(serializers.Serializer):
+    phone = serializers.CharField(max_length=13, required=True, write_only=True)
+    password = serializers.CharField(max_length=255, required=True, write_only=True)
+
+    def validate(self, attrs):
+        user = models.CustomUser.objects.filter(phone=attrs['phone'], status="code_verified").first()
+        if not user:
+            raise serializers.ValidationError({"phone": "You have not registered in the system before, please register"})
+        elif not user.check_password(attrs['password']):
+            raise serializers.ValidationError({"password": "The password was entered incorrectly"})
+        return attrs
+
