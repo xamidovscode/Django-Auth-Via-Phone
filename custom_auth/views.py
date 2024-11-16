@@ -2,6 +2,7 @@ from rest_framework import generics
 from . import serializers
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from . import models
 
 
@@ -24,6 +25,7 @@ class RegisterAPIView(generics.CreateAPIView):
 
 class CodeVerificationAPIView(generics.CreateAPIView):
     serializer_class = serializers.CodeVerificationSerializer
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, context={"user": self.request.user})
