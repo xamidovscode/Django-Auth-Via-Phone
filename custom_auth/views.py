@@ -3,7 +3,9 @@ from . import serializers
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 from . import models
+from .permissions import IsCodeVerified
 
 
 class RegisterAPIView(generics.CreateAPIView):
@@ -57,3 +59,11 @@ class LoginAPIView(generics.CreateAPIView):
             },
             status=status.HTTP_200_OK
         )
+
+
+class TestTokenAPIView(APIView):
+    permission_classes = [IsCodeVerified]
+
+    @classmethod
+    def get(cls, request, *args, **kwargs):
+        return Response("success")
