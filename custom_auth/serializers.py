@@ -2,6 +2,9 @@ from rest_framework import serializers
 from . import models
 import random
 from django.core.cache import cache
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
+
 
 def generate_random_number():
     return ''.join([str(random.randint(0, 9)) for _ in range(5)])
@@ -60,4 +63,18 @@ class LoginSerializer(serializers.Serializer):
         elif not user.check_password(attrs['password']):
             raise serializers.ValidationError({"password": "The password was entered incorrectly"})
         return attrs
+
+
+class LogOutSerializer(serializers.Serializer):
+    refresh_token = serializers.CharField(max_length=255, required=True, write_only=True)
+
+    def create(self, validated_data):
+        token = validated_data.pop("refresh_token")
+        try:
+            refresh_token = RefreshToken(token)
+            outstanding_token = OutstandingToken.objects.get(token=refresh_token)
+            BlacklistedToken.objects.create(token=outstanding_token)
+        except Exception as e:
+            raise serializers.ValidationError({"msg": e})
+        return validated_data
 

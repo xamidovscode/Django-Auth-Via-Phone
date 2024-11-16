@@ -67,3 +67,8 @@ class TestTokenAPIView(APIView):
     @classmethod
     def get(cls, request, *args, **kwargs):
         return Response("success")
+
+
+class LogOutAPIView(generics.CreateAPIView):
+    permission_classes = [IsCodeVerified]
+    serializer_class = serializers.LogOutSerializer

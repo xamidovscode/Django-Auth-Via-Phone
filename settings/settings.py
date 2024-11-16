@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'custom_auth',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
 
 ]
 
